@@ -47,3 +47,13 @@
     - name: "Деплой додатка в Kubernetes"
       become: no
       shell: kubectl apply -f /home/ubuntu/k8s.yaml
+      
+    - name: "Чекаємо, поки додаток запуститься (30 сек)"
+      pause:
+        seconds: 30
+
+    - name: "Прокидаємо порт додатка на весь інтернет"
+      become: no
+      # Ця команда мапить порт сервісу прямо на публічний IP сервера
+      shell: |
+        nohup kubectl port-forward --address 0.0.0.0 service/python-service 30080:80 > /dev/null 2>&1 &
