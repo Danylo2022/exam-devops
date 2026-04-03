@@ -1,4 +1,4 @@
-- name: "Встановлення компонентів Kubernetes"
+- name: "Встановлення компонентів та Деплой"
   hosts: all
   become: yes
   tasks:
@@ -12,14 +12,12 @@
         state: present
 
     - name: "Додавання користувача ubuntu до групи docker"
-      # Це дає права керувати докером без sudo
       user:
         name: ubuntu
         groups: docker
         append: yes
 
     - name: "Перезавантаження SSH сесії"
-      # Це критично: щоб права групи docker почали діяти
       meta: reset_connection
 
     - name: "Завантаження Minikube"
@@ -39,14 +37,15 @@
 
     - name: "Запуск Minikube через Docker"
       become: no
-      # Додаємо --force, щоб minikube не боявся працювати в CI
       shell: minikube start --driver=docker --force
 
-- name: "Копіюю K8s маніфест на сервер"
+    - name: "Копіюю K8s маніфест на сервер"
+      # Копіюємо файл з папки task3 у домашню директорію сервера
       copy:
         src: ../task3/k8s.yaml
         dest: /home/ubuntu/k8s.yaml
 
     - name: "Деплой додатка в Kubernetes"
       become: no
+      # Запускаємо маніфест у кластері
       shell: kubectl apply -f /home/ubuntu/k8s.yaml
