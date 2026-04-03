@@ -37,6 +37,7 @@ resource "aws_security_group" "firewall" {
 # 4. Віртуальна машина (Node) [cite: 14]
 resource "aws_instance" "node" {
   ami           = "ami-0084a47cc718c111a" # AMI для Ubuntu 24.04 в eu-central-1 
+  key_name      = aws_key_pair.shram_key.key_name
   instance_type = "t3.medium"            # Розмір для Minikube/K8s [cite: 15]
   tags = { Name = "${var.surname}-node" }
 }
@@ -44,6 +45,13 @@ resource "aws_instance" "node" {
 # 5. Бакет S3 [cite: 18, 19]
 resource "aws_s3_bucket" "state_bucket" {
   bucket = lower("${var.surname}-bucket-task-unique-id") # Назва бакету [cite: 19]
+}
+
+# Реєструємо публічний ключ в AWS
+resource "aws_key_pair" "shram_key" {
+  key_name   = "shram-deployer-key"
+  # Ми використовуємо функцію file, щоб Terraform сам прочитав ключ
+  public_key = file("${path.module}/../task2/id_rsa.pub")
 }
 
 # Triggering CI/CD
