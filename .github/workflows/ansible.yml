@@ -1,0 +1,30 @@
+name: "Task 2: Ansible Components"
+
+on:
+  push:
+    paths:
+      - 'task2/**' # Запускається, коли змінюю файли в папці task2
+
+jobs:
+  ansible:
+    name: "Налаштування сервера 18.195.51.209"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Копіюю код репозиторію"
+        uses: actions/checkout@v4
+
+      - name: "Налаштовую SSH ключ для доступу"
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: "Перевірка синтаксису плейбука"
+        # Перевіряю, чи все ок з кодом перед запуском
+        run: ansible-playbook -i task2/hosts.ini task2/playbook.yml --syntax-check
+
+      - name: "Запуск встановлення компонентів"
+        # Ставлю Docker, Minikube та Helm на сервак
+        run: |
+          ansible-playbook -i task2/hosts.ini task2/playbook.yml \
+          -e "ansible_ssh_extra_args='-o StrictHostKeyChecking=no'"
