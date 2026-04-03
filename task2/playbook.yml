@@ -1,0 +1,32 @@
+- name: "Встановлення компонентів Kubernetes"
+  hosts: all
+  become: yes
+  tasks:
+    - name: "Оновлення кешу пакетів"
+      apt:
+        update_cache: yes
+
+    - name: "Встановлення Docker"
+      apt:
+        name: docker.io
+        state: present
+
+    - name: "Завантаження Minikube"
+      get_url:
+        url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+        dest: /usr/local/bin/minikube
+        mode: '0755'
+
+    - name: "Встановлення kubectl"
+      shell: |
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+    - name: "Встановлення Helm 3"
+      shell: |
+        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+    - name: "Запуск Minikube через Docker"
+      # Запускаємо від імені звичайного користувача ubuntu
+      become: no
+      shell: minikube start --driver=docker
