@@ -1,0 +1,40 @@
+name: "Task 1: Terraform Infrastructure"
+
+on:
+  push:
+    paths:
+      - 'task1/**' # Запускається тільки при змінах у папці з Terraform
+
+jobs:
+  terraform:
+    name: "Terraform Build and Deploy"
+    runs-on: ubuntu-latest
+
+    env:
+      # Використовуємо секрети, які ти додав у GitHub
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: "eu-central-1"
+
+    steps:
+      - name: "Checkout Code"
+        uses: actions/checkout@v4
+
+      - name: "Setup Terraform"
+        uses: hashicorp/setup-terraform@v3
+
+      - name: "Terraform Init"
+        run: terraform -chdir=task1 init
+
+      - name: "Terraform Validate"
+        run: terraform -chdir=task1 validate
+
+      - name: "Terraform Plan (Перевірка)"
+        id: plan
+        # Вимога іспиту: перевірка без реального розгортання
+        run: terraform -chdir=task1 plan -no-color
+        continue-on-error: false # Якщо план помилковий, конвеєр зупиниться
+
+      - name: "Terraform Apply"
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform -chdir=task1 apply -auto-approve
