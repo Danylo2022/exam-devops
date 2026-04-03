@@ -1,11 +1,11 @@
 name: "Task 2 & 3: Ansible & K8s Deploy"
 
-# ТРИГЕРИ МАЮТЬ БУТИ ТУТ (НА ПОЧАТКУ)
+
 on:
   push:
     paths:
       - 'task2/**'
-      - 'task3/**' # Тепер конвеєр бачить зміни і в докері, і в ансіблі
+      - 'task3/**'
 
 jobs:
   ansible:
