@@ -45,3 +45,5 @@ resource "aws_instance" "node" {
 resource "aws_s3_bucket" "state_bucket" {
   bucket = lower("${var.surname}-bucket-task-unique-id") # Назва бакету [cite: 19]
 }
+
+# Triggering CI/CD
