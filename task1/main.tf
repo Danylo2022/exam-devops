@@ -51,10 +51,10 @@ resource "aws_security_group" "firewall" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # Дозволяємо вхід для веб-сервера (Завдання 3)
+  # ДОЗВОЛЯЄМО ВХІД ДЛЯ KUBERNETES NODEPORT (Завдання 3)
   ingress {
-    from_port   = 80
-    to_port     = 80
+    from_port   = 30080
+    to_port     = 30080
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
