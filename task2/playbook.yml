@@ -11,6 +11,17 @@
         name: docker.io
         state: present
 
+    - name: "Додавання користувача ubuntu до групи docker"
+      # Це дає права керувати докером без sudo
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
+    - name: "Перезавантаження SSH сесії"
+      # Це критично: щоб права групи docker почали діяти
+      meta: reset_connection
+
     - name: "Завантаження Minikube"
       get_url:
         url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
@@ -27,6 +38,6 @@
         curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
     - name: "Запуск Minikube через Docker"
-      # Запускаємо від імені звичайного користувача ubuntu
       become: no
-      shell: minikube start --driver=docker
+      # Додаємо --force, щоб minikube не боявся працювати в CI
+      shell: minikube start --driver=docker --force
