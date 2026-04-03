@@ -41,3 +41,12 @@
       become: no
       # Додаємо --force, щоб minikube не боявся працювати в CI
       shell: minikube start --driver=docker --force
+
+- name: "Копіюю K8s маніфест на сервер"
+      copy:
+        src: ../task3/k8s.yaml
+        dest: /home/ubuntu/k8s.yaml
+
+    - name: "Деплой додатка в Kubernetes"
+      become: no
+      shell: kubectl apply -f /home/ubuntu/k8s.yaml

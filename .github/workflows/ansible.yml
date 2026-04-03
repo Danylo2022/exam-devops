@@ -1,30 +1,30 @@
-name: "Task 2: Ansible Components"
+name: "Task 2 & 3: Ansible & K8s Deploy"
 
+# ТРИГЕРИ МАЮТЬ БУТИ ТУТ (НА ПОЧАТКУ)
 on:
   push:
     paths:
-      - 'task2/**' # Запускається, коли змінюю файли в папці task2
+      - 'task2/**'
+      - 'task3/**' # Тепер конвеєр бачить зміни і в докері, і в ансіблі
 
 jobs:
   ansible:
-    name: "Налаштування цільового вузла" # Замість цифр пишу текст, щоб назва була універсальною
+    name: "Налаштування та Деплой"
     runs-on: ubuntu-latest
     steps:
-      - name: "Копіюю код мого репозиторію"
+      - name: "Забираю код"
         uses: actions/checkout@v4
 
-      - name: "Налаштовую SSH ключ для доступу до сервака"
+      - name: "Налаштовую SSH ключ"
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      - name: "Перевірка синтаксису плейбука"
-        # Перевіряю, чи все ок з кодом перед тим як реально щось ставити
+      - name: "Перевірка синтаксису"
         run: ansible-playbook -i task2/hosts.ini task2/playbook.yml --syntax-check
 
-      - name: "Запуск встановлення компонентів"
-        # Ставлю Docker, Minikube та Helm на сервер
+      - name: "Запуск плейбука (Інсталяція + Деплой)"
         run: |
           ansible-playbook -i task2/hosts.ini task2/playbook.yml \
           -e "ansible_ssh_extra_args='-o StrictHostKeyChecking=no'"
